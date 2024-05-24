@@ -31,7 +31,7 @@ jobs:
     - name: Extract Project Version
       id: get_version
       run: |
-        VERSION=$(xmllint --xpath "/*[local-name()='project']/*[local-name()='version']/text()" java-swing-app/pom.xml)
+        VERSION=$(xmllint --xpath "/*[local-name()='project']/*[local-name()='version']/text()" shanoir-uploader/pom.xml)
         echo ::set-output name=version::$VERSION
 
     - name: Build with Maven
