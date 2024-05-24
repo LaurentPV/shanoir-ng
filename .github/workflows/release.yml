@@ -34,19 +34,10 @@ jobs:
         VERSION=$(xmllint --xpath "/*[local-name()='project']/*[local-name()='version']/text()" shanoir-uploader/pom.xml)
         echo ::set-output name=version::$VERSION
 
-    - name: Build shanoir-ng-ms-common
-      run: mvn -f shanoir-ng-ms-common/pom.xml install
+    - name: Build shanoir-ng with Maven
+      run: mvn -f shanoir-ng-parent/pom.xml clean install
 
-    - name: Build shanoir-ng-import
-      run: mvn -f shanoir-ng-import/pom.xml install
-
-    - name: Build shanoir-ng-anonymization
-      run: mvn -f shanoir-ng-anonymization/pom.xml install
-
-    - name: Build shanoir-ng-exchange
-      run: mvn -f shanoir-ng-exchange/pom.xml install
-
-    - name: Build with Maven
+    - name: Build shanoir-uploader with Maven
       run: mvn -f shanoir-uploader/pom.xml package
 
     - name: Create GitHub Release
