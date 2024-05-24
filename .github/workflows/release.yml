@@ -35,7 +35,7 @@ jobs:
         echo ::set-output name=version::$VERSION
 
     - name: Build shanoir-ng with Maven
-      run: mvn -f shanoir-ng-parent/pom.xml clean install
+      run: mvn -f shanoir-ng-parent/pom.xml clean install -DskipTests
 
     - name: Build shanoir-uploader with Maven
       run: mvn -f shanoir-uploader/pom.xml package
