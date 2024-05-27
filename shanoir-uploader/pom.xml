@@ -295,7 +295,7 @@
 				<version>1.7</version>
 				<executions>
 					<execution>
-						<phase>package</phase>
+						<phase>prepare-package</phase>
 						<configuration>
 							<tasks>
 								<copy file="start-shup-windows-java.bat" tofile="target/start-shup-windows-java.bat" />
@@ -317,7 +317,7 @@
             	<version>1.5.3</version>
             	<executions>
                 	<execution>
-                    	<phase>prepare-package</phase>
+                    	<phase>package</phase>
                     	<goals>
                         	<goal>replace</goal>
                     	</goals>
