@@ -51,7 +51,7 @@ jobs:
         KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
 
     - name: Build shanoir-uploader with Maven
-      run: mvn -f shanoir-uploader/pom.xml package -x
+      run: mvn -f shanoir-uploader/pom.xml package -X
       env:
         MAVEN_OPTS: "-Djavax.net.ssl.trustStore=shanoir-uploader/mykeystore.jks -Djavax.net.ssl.trustStorePassword=${{ secrets.KEYSTORE_PASS }}"
         KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
