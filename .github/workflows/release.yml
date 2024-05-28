@@ -39,7 +39,7 @@ jobs:
 
     - name: Decode and write keystore
       run: | 
-        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > mykeystore.jks
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > shanoir-uploader/mykeystore.jks
 
     - name: Verify keystore
       run: ls -l shanoir-uploader/mykeystore.jks
