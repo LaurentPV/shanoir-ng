@@ -42,7 +42,7 @@ jobs:
         echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > mykeystore.jks
 
     - name: Build shanoir-ng with Maven
-      run: mvn -f shanoir-ng-parent/pom.xml clean install -DskipTests -pl !shanoir-uploader
+      run: mvn -f shanoir-ng-parent/pom.xml clean install -DskipTests
       env:
         MAVEN_OPTS: "-Djavax.net.ssl.trustStore=shanoir-uploader/mykeystore.jks -Djavax.net.ssl.trustStorePassword=${{ secrets.KEYSTORE_PASS }}"
         KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
