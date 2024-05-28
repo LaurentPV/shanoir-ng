@@ -346,7 +346,7 @@
         			</execution>
       			</executions>
       			<configuration>
-        			<keystore>${project.basedir}/mykeystore.jks.base64</keystore>
+        			<keystore>${project.basedir}/mykeystore.jks</keystore>
         			<storepass>${env.KEYSTORE_PASS}</storepass>
         			<alias>${env.KEY_ALIAS}</alias>
       			</configuration>
