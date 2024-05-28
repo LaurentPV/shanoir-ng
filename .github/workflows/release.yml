@@ -38,7 +38,8 @@ jobs:
       run: echo "${{ secrets.KEYSTORE_BASE64 }}"
 
     - name: Decode and write keystore
-      run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > mykeystore.jks
+      run: | 
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > mykeystore.jks
 
     - name: Build shanoir-ng with Maven
       run: mvn -f shanoir-ng-parent/pom.xml clean install -DskipTests
