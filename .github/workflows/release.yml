@@ -34,11 +34,19 @@ jobs:
         VERSION=$(xmllint --xpath "/*[local-name()='project']/*[local-name()='version']/text()" shanoir-uploader/pom.xml)
         echo ::set-output name=version::$VERSION
 
+    - name: Decode and write keystore
+      run: |
+        echo ${{ secrets.KEYSTORE_BASE64 }} | base64 --decode > mykeystore.jks
+
     - name: Build shanoir-ng with Maven
       run: mvn -f shanoir-ng-parent/pom.xml clean install -DskipTests
 
     - name: Build shanoir-uploader with Maven
       run: mvn -f shanoir-uploader/pom.xml package
+      env:
+        MAVEN_OPTS: "-Djavax.net.ssl.trustStore=mykeystore.jks -Djavax.net.ssl.trustStorePassword=${{ secrets.KEYSTORE_PASS }}"
+        KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
 
     - name: Create GitHub Release
       id: create_release
