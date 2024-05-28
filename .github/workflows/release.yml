@@ -34,6 +34,9 @@ jobs:
         VERSION=$(xmllint --xpath "/*[local-name()='project']/*[local-name()='version']/text()" shanoir-uploader/pom.xml)
         echo ::set-output name=version::$VERSION
 
+    - name: Check base64 content
+      run: echo "${{ secrets.KEYSTORE_BASE64 }}"
+
     - name: Decode and write keystore
       run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > mykeystore.jks
 
