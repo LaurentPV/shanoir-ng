@@ -4,7 +4,7 @@
 
 	<groupId>org.shanoir.uploader</groupId>
 	<artifactId>shanoir-uploader</artifactId>
-	<version>8.0.4</version>
+	<version>8.0.5</version>
 	<packaging>jar</packaging>
 
 	<name>ShanoirUploader</name>
@@ -334,27 +334,6 @@
             	</configuration>
         	</plugin>
 			<plugin>
-      			<groupId>org.apache.maven.plugins</groupId>
-      			<artifactId>maven-jarsigner-plugin</artifactId>
-      			<version>3.0.0</version>
-      			<executions>
-        			<execution>
-						<id>signer</id>
-          				<phase>package</phase>
-          				<goals>
-            				<goal>sign</goal>
-          				</goals>
-						<configuration>
-							<archive>${project.build.directory}/shanoir-uploader-${project.version}-jar-with-dependencies.jar</archive>
-        					<keystore>${project.basedir}/mykeystore.jks</keystore>
-        					<storepass>${env.KEYSTORE_PASS}</storepass>
-							<keypass>${env.KEYSTORE_PASS}</keypass>
-        					<alias>${env.KEY_ALIAS}</alias>
-      					</configuration>
-        			</execution>
-      			</executions>
-    		</plugin>
-			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<executions>
 					<execution>
@@ -396,6 +375,27 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+      			<groupId>org.apache.maven.plugins</groupId>
+      			<artifactId>maven-jarsigner-plugin</artifactId>
+      			<version>3.0.0</version>
+      			<executions>
+        			<execution>
+						<id>signer</id>
+          				<phase>verify</phase>
+          				<goals>
+            				<goal>sign</goal>
+          				</goals>
+						<configuration>
+							<archive>${project.build.directory}/shanoir-uploader-${project.version}-jar-with-dependencies.jar</archive>
+        					<keystore>${project.basedir}/mykeystore.jks</keystore>
+        					<storepass>${env.KEYSTORE_PASS}</storepass>
+							<keypass>${env.KEYSTORE_PASS}</keypass>
+        					<alias>${env.KEY_ALIAS}</alias>
+      					</configuration>
+        			</execution>
+      			</executions>
+    		</plugin>
 		</plugins>
 	</build>
 
