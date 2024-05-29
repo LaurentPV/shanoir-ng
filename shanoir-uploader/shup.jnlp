@@ -5,6 +5,7 @@
 		<vendor>Empenn Team - Inria</vendor>
 		<homepage href="https://project.inria.fr/shanoir/" />
 		<description>Desktop client for the Shanoir server</description>
+		<icon href="images/simpleLogo.png"/>
 	</information>
 	<security>
 		<all-permissions/>
