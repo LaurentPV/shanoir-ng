@@ -4,7 +4,7 @@
 
 	<groupId>org.shanoir.uploader</groupId>
 	<artifactId>shanoir-uploader</artifactId>
-	<version>8.0.5</version>
+	<version>8.0.6</version>
 	<packaging>jar</packaging>
 
 	<name>ShanoirUploader</name>
@@ -382,7 +382,6 @@
       			<executions>
         			<execution>
 						<id>signer</id>
-          				<phase>verify</phase>
           				<goals>
             				<goal>sign</goal>
           				</goals>
