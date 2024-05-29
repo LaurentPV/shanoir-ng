@@ -339,13 +339,16 @@
       			<version>3.0.0</version>
       			<executions>
         			<execution>
+						<id>signer</id>
           				<phase>package</phase>
           				<goals>
             				<goal>sign</goal>
           				</goals>
 						<configuration>
+							<archive>${project.build.directory}/shanoir-uploader-${project.version}-jar-with-dependencies.jar</archive>
         					<keystore>${project.basedir}/mykeystore.jks</keystore>
         					<storepass>${env.KEYSTORE_PASS}</storepass>
+							<keypass>${env.KEYSTORE_PASS}</keypass>
         					<alias>${env.KEY_ALIAS}</alias>
       					</configuration>
         			</execution>
