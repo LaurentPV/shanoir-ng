@@ -343,13 +343,13 @@
           				<goals>
             				<goal>sign</goal>
           				</goals>
+						<configuration>
+        					<keystore>${project.basedir}/mykeystore.jks</keystore>
+        					<storepass>${env.KEYSTORE_PASS}</storepass>
+        					<alias>${env.KEY_ALIAS}</alias>
+      					</configuration>
         			</execution>
       			</executions>
-      			<configuration>
-        			<keystore>${project.basedir}/mykeystore.jks</keystore>
-        			<storepass>${env.KEYSTORE_PASS}</storepass>
-        			<alias>${env.KEY_ALIAS}</alias>
-      			</configuration>
     		</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
