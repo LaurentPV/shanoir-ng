@@ -45,7 +45,7 @@ jobs:
       run: ls -l shanoir-uploader/mykeystore.jks
 
     - name: Build shanoir-ng with Maven
-      run: mvn -f shanoir-ng-parent/pom.xml clean install -DskipTests
+      run: mvn -f shanoir-ng-parent/pom.xml clean install -DskipTests -e
       env:
         KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
         KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
