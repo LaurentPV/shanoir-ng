@@ -59,7 +59,7 @@ jobs:
 
     - name: Verify JAR signature
       run: |
-        jarsigner -verify shanoir-uploader/target/shanoir-uploader-8.0.10-jar-with-dependencies.jar
+        jarsigner -verify shanoir-uploader/target/shanoir-uploader-${{ steps.get_version.outputs.version }}-jar-with-dependencies.jar
       env:
         MAVEN_OPTS: "-Djavax.net.ssl.trustStore=mykeystore.jks -Djavax.net.ssl.trustStorePassword=${{ secrets.KEYSTORE_PASS }} -Djavax.net.ssl.keyStore=mykeystore.jks -Djavax.net.ssl.keyStorePassword=${{ secrets.KEYSTORE_PASS }}"
 
@@ -80,8 +80,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: shanoir-uploader/target/shanoir-uploader-jar-with-dependencies.jar
-        asset_name: shanoir-uploader-jar-with-dependencies.jar
+        asset_path: shanoir-uploader/target/shanoir-uploader-${{ steps.get_version.outputs.version }}-jar-with-dependencies.jar
+        asset_name: shanoir-uploader-${{ steps.get_version.outputs.version }}-jar-with-dependencies.jar
         asset_content_type: application/java-archive
 
     - name: Upload JNLP Asset
