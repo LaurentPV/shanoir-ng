@@ -5,14 +5,14 @@
 		<vendor>Empenn Team - Inria</vendor>
 		<homepage href="https://project.inria.fr/shanoir/" />
 		<description>Desktop client for the Shanoir server</description>
-		<icon href="simpleLogo_64x64.png"/>
+		<icon href="https://raw.githubusercontent.com/LaurentPV/shanoir-ng/Laurent_test_ows/shanoir-uploader/src/main/resources/images/simpleLogo.64x64.png"/>
 	</information>
 	<security>
 		<all-permissions/>
 	</security>
 	<resources>
 		<j2se version="17+" />
-		<jar href="shanoir-uploader-${project.version}-jar-with-dependencies.jar" />
+		<jar href="shanoir-uploader-jar-with-dependencies.jar" />
 	</resources>
 	<application-desc main-class="org.shanoir.uploader.ShanoirUploader" />
 </jnlp>

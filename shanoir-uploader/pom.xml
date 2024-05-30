@@ -4,7 +4,7 @@
 
 	<groupId>org.shanoir.uploader</groupId>
 	<artifactId>shanoir-uploader</artifactId>
-	<version>8.0.8</version>
+	<version>8.0.9</version>
 	<packaging>jar</packaging>
 
 	<name>ShanoirUploader</name>
@@ -367,7 +367,7 @@
 						</goals>
 						<configuration>
 							<appendAssemblyId>false</appendAssemblyId>
-							<finalName>${project.artifactId}-${project.version}-${maven.build.timestamp}</finalName>
+							<finalName>${project.artifactId}-${maven.build.timestamp}</finalName>
 							<descriptors>
 								<descriptor>src/main/assembly/zip.xml</descriptor>
 							</descriptors>
@@ -386,7 +386,7 @@
             				<goal>sign</goal>
           				</goals>
 						<configuration>
-							<archive>${project.build.directory}/shanoir-uploader-${project.version}-jar-with-dependencies.jar</archive>
+							<archive>${project.build.directory}/shanoir-uploader-jar-with-dependencies.jar</archive>
         					<keystore>${project.basedir}/mykeystore.jks</keystore>
         					<storepass>${env.KEYSTORE_PASS}</storepass>
 							<keypass>${env.KEYSTORE_PASS}</keypass>
