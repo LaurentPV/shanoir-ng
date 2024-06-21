@@ -98,7 +98,9 @@ public class CardsProcessingService {
     /**
 	 * Study cards for quality control: apply on entire exam.
 	 *
-	 * @param studyCard
+	 * @param qualityCard
+     * @param examination
+     * @param updateTags
 	 * @throws MicroServiceCommunicationException
 	 */
 	public QualityCardResult applyQualityCardOnExamination(QualityCard qualityCard, Examination examination, boolean updateTags) throws MicroServiceCommunicationException {
@@ -143,7 +145,10 @@ public class CardsProcessingService {
 	/**
 	 * Study cards for quality control: apply on entire study.
 	 * 
-	 * @param studyCard
+	 * @param qualityCard
+     * @param updateTags
+     * @param start
+     * @param stop
 	 * @throws MicroServiceCommunicationException 
 	 */
 	public QualityCardResult applyQualityCardOnStudy(QualityCard qualityCard, boolean updateTags, Integer start, Integer stop) throws MicroServiceCommunicationException {
@@ -207,7 +212,8 @@ public class CardsProcessingService {
     /**
 	 * Study cards for quality control: apply on entire study.
 	 *
-	 * @param studyCard
+	 * @param qualityCard
+     * @param updateTags
 	 * @throws MicroServiceCommunicationException
 	 */
 	public QualityCardResult applyQualityCardOnStudy(QualityCard qualityCard, boolean updateTags) throws MicroServiceCommunicationException {
@@ -217,7 +223,9 @@ public class CardsProcessingService {
         /**
 	 * Study cards for quality control: apply on entire study.
 	 *
-	 * @param studyCard
+	 * @param qualityCard
+     * @param start
+     * @param stop
 	 * @throws MicroServiceCommunicationException
 	 */
 	public QualityCardResult applyQualityCardOnStudy(QualityCard qualityCard, Integer start, Integer stop) throws MicroServiceCommunicationException {

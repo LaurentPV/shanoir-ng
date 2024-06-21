@@ -39,7 +39,7 @@ import jakarta.persistence.PostLoad;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * Study card.
+ * Quality card.
  *
  * @author msimon
  *
@@ -50,13 +50,13 @@ import jakarta.validation.constraints.NotNull;
 @GenericGenerator(name = "IdOrGenerate", strategy = "org.shanoir.ng.shared.model.UseIdOrGenerate")
 public class QualityCard extends HalEntity implements Card {
 
-	/** The name of the study card. */
+	/** The name of the quality card. */
     @NotBlank
 	@Column(unique = true)
 	@Unique
 	private String name;
 
-	/** The study for which is defined the study card. */
+	/** The study for which is defined the quality card. */
 	private Long studyId;
 	
 	@NotNull
@@ -71,7 +71,7 @@ public class QualityCard extends HalEntity implements Card {
 	 */
 	@PostLoad
 	public void initLinks() {
-		this.addLink(Links.REL_SELF, "studycard/" + getId());
+		this.addLink(Links.REL_SELF, "qualitycard/" + getId());
 	}
 
 	public String getName() {

@@ -25,7 +25,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * This class contains the result of an application of a study card
+ * This class contains the result of an application of a quality card
  * on an entire study. For each examination, when the result is wrong
  * on the examination level already, we will not check deeper on the
  * acquisition level. When everything is clear on the examination level,
