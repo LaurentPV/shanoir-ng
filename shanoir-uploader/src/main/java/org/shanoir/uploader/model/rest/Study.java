@@ -17,6 +17,8 @@ public class Study implements Comparable<Study> {
 	
 	private List<StudyCard> studyCards;
 
+	private List<QualityCard> qualityCards;
+
 	private List<StudyCenter> studyCenterList;
 
 	private Boolean compatible;
@@ -51,6 +53,14 @@ public class Study implements Comparable<Study> {
 
 	public void setStudyCards(List<StudyCard> studyCards) {
 		this.studyCards = studyCards;
+	}
+
+	public List<QualityCard> getQualityCards() {
+		return qualityCards;
+	}
+
+	public void setQualityCards(List<QualityCard> qualityCards) {
+		this.qualityCards = qualityCards;
 	}
 
 	public List<StudyCenter> getStudyCenterList() {

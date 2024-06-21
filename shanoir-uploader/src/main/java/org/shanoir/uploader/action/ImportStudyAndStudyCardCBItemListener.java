@@ -15,6 +15,7 @@ import org.shanoir.uploader.gui.customcomponent.JComboBoxMandatory;
 import org.shanoir.uploader.model.rest.AcquisitionEquipment;
 import org.shanoir.uploader.model.rest.Examination;
 import org.shanoir.uploader.model.rest.IdName;
+import org.shanoir.uploader.model.rest.QualityCard;
 import org.shanoir.uploader.model.rest.Study;
 import org.shanoir.uploader.model.rest.StudyCard;
 import org.shanoir.uploader.model.rest.Subject;
@@ -49,6 +50,7 @@ public class ImportStudyAndStudyCardCBItemListener implements ItemListener {
 			if (e.getSource().equals(mainWindow.importDialog.studyCB)) {
 				Study study = (Study) e.getItem();
 				updateStudyCards(study);
+				updateQualityCards(study);
 				updateSubjectStudy(study);
 				filterExistingExamsForSelectedStudy(study);
 			}
@@ -119,6 +121,16 @@ public class ImportStudyAndStudyCardCBItemListener implements ItemListener {
 			}
 		}
 		
+	}
+
+	@SuppressWarnings("unchecked")
+	private void updateQualityCards(Study study) {
+		mainWindow.importDialog.qualityCardCB.removeAllItems();
+		if (study.getQualityCards() != null) {
+			for (QualityCard qualityCard : study.getQualityCards()) {
+				mainWindow.importDialog.qualityCardCB.addItem(qualityCard);
+			}
+		}
 	}
 
 	private void updateSubjectStudy(Study study) {

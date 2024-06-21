@@ -23,12 +23,14 @@ import org.shanoir.ng.importer.model.ImportJob;
 import org.shanoir.uploader.ShUpConfig;
 import org.shanoir.uploader.ShUpOnloadConfig;
 import org.shanoir.uploader.model.dto.StudyCardOnStudyResultDTO;
+import org.shanoir.uploader.model.dto.QualityCardOnStudyResultDTO;
 import org.shanoir.uploader.model.rest.AcquisitionEquipment;
 import org.shanoir.uploader.model.rest.Center;
 import org.shanoir.uploader.model.rest.Examination;
 import org.shanoir.uploader.model.rest.IdList;
 import org.shanoir.uploader.model.rest.Manufacturer;
 import org.shanoir.uploader.model.rest.ManufacturerModel;
+import org.shanoir.uploader.model.rest.QualityCard;
 import org.shanoir.uploader.model.rest.Study;
 import org.shanoir.uploader.model.rest.StudyCard;
 import org.shanoir.uploader.model.rest.Subject;
@@ -58,6 +60,10 @@ public class ShanoirUploaderServiceClient {
 	private static final String SERVICE_STUDYCARDS_FIND_BY_STUDY_IDS = "service.studycards.find.by.study.ids";
 
 	private static final String SERVICE_STUDYCARDS_APPLY_ON_STUDY = "service.studycards.apply.on.study";
+
+	private static final String SERVICE_QUALITYCARDS_FIND_BY_STUDY_ID = "service.qualitycards.find.by.study.id";
+
+	private static final String SERVICE_QUALITYCARDS_APPLY_ON_STUDY = "service.qualitycards.apply.on.study";
 	
 	private static final String SERVICE_CENTERS_CREATE = "service.centers.create";
 
@@ -104,6 +110,10 @@ public class ShanoirUploaderServiceClient {
 	private String serviceURLStudyCardsByStudyIds;
 
 	private String serviceURLStudyCardsApplyOnStudy;
+
+	private String serviceURLQualityCardsByStudyId;
+
+	private String serviceURLQualityCardsApplyOnStudy;
 	
 	private String serviceURLCentersCreate;
 
@@ -164,6 +174,10 @@ public class ShanoirUploaderServiceClient {
 				+ ShUpConfig.endpointProperties.getProperty(SERVICE_STUDYCARDS_FIND_BY_STUDY_IDS);
 		this.serviceURLStudyCardsApplyOnStudy = this.serverURL
 				+ ShUpConfig.endpointProperties.getProperty(SERVICE_STUDYCARDS_APPLY_ON_STUDY);
+		this.serviceURLQualityCardsByStudyId = this.serverURL
+				+ ShUpConfig.endpointProperties.getProperty(SERVICE_QUALITYCARDS_FIND_BY_STUDY_ID);
+		this.serviceURLQualityCardsApplyOnStudy = this.serverURL
+				+ ShUpConfig.endpointProperties.getProperty(SERVICE_QUALITYCARDS_APPLY_ON_STUDY);	
 		this.serviceURLCentersCreate = this.serverURL
 				+ ShUpConfig.endpointProperties.getProperty(SERVICE_CENTERS_CREATE);
 		this.serviceURLAcquisitionEquipments = this.serverURL
@@ -328,6 +342,28 @@ public class ShanoirUploaderServiceClient {
 					return studyCards;
 				} else {
 					logger.error("Could not get study cards for studyIds (status code: " + code + ", message: " + apiResponseMessages.getOrDefault(code, "unknown status code") + ")");
+				}
+			}
+		} catch (JsonProcessingException e) {
+			logger.error(e.getMessage(), e);
+		}
+		return null;
+	}
+
+	public List<QualityCard> findQualityCardsByStudyId(Long studyId) throws Exception {
+		try {
+			String studyIdentifier = URLEncoder.encode(Long.toString(studyId), "UTF-8");
+			long startTime = System.currentTimeMillis();
+			try (CloseableHttpResponse response = httpService.get(this.serviceURLQualityCardsByStudyId + studyIdentifier)) {
+				long stopTime = System.currentTimeMillis();
+			    long elapsedTime = stopTime - startTime;
+			    logger.info("findQualityCardsByStudyId: " + elapsedTime + "ms");
+				int code = response.getCode();
+				if (code == HttpStatus.SC_OK) {
+					List<QualityCard> qualityCards = Util.getMappedList(response, QualityCard.class);
+					return qualityCards;
+				} else {
+					logger.error("Could not get quality cards for studyId : " +  studyIdentifier + " (status code: " + code + ", message: " + apiResponseMessages.getOrDefault(code, "unknown status code") + ")");
 				}
 			}
 		} catch (JsonProcessingException e) {
@@ -819,6 +855,21 @@ public class ShanoirUploaderServiceClient {
 				logger.error("Error in applyStudyCardOnStudy: (status code: " + code
 						+ ", message: " + apiResponseMessages.getOrDefault(code, "unknown status code") + ")");
 				throw new Exception("Error in applyStudyCardOnStudy");
+			}
+		}
+	}
+
+	public List<QualityCardOnStudyResultDTO> applyQualityCardOnStudy(Long qualityCardId) throws Exception {
+		logger.info("Apply qualityCard on study, started on server.");
+		try (CloseableHttpResponse response = httpService.get(this.serviceURLQualityCardsApplyOnStudy + qualityCardId)) {
+			int code = response.getCode();
+			if (code == HttpStatus.SC_OK) {
+				List<QualityCardOnStudyResultDTO> results = Util.getMappedList(response, QualityCardOnStudyResultDTO.class);
+				return results;
+			} else {
+				logger.error("Error in applyQualityCardOnStudy: (status code: " + code
+						+ ", message: " + apiResponseMessages.getOrDefault(code, "unknown status code") + ")");
+				throw new Exception("Error in applyQualityCardOnStudy");
 			}
 		}
 	}

@@ -21,6 +21,7 @@ import org.shanoir.uploader.model.rest.IdList;
 import org.shanoir.uploader.model.rest.ImagedObjectCategory;
 import org.shanoir.uploader.model.rest.Study;
 import org.shanoir.uploader.model.rest.StudyCard;
+import org.shanoir.uploader.model.rest.QualityCard;
 import org.shanoir.uploader.model.rest.Subject;
 import org.shanoir.uploader.model.rest.SubjectType;
 import org.shanoir.uploader.service.rest.ShanoirUploaderServiceClient;
@@ -68,7 +69,7 @@ public class ImportDialogOpener {
 			// update import dialog with items from server
 			updateImportDialogForSubject(subject); // this has to be done after init of the dialog
 			updateImportDialogForNewExamFields(studyDate, uploadJob.getStudyDescription());
-			updateImportDialogForStudyAndStudyCard(studiesWithStudyCards);
+			updateImportDialogForStudyInformations(studiesWithStudyCards);
 			updateImportDialogForMRICenter(uploadJob);
 			importDialog.mrExaminationExamExecutiveLabel.setVisible(false);
 			importDialog.mrExaminationExamExecutiveCB.setVisible(false);
@@ -102,11 +103,11 @@ public class ImportDialogOpener {
 
 	/**
 	 * This method calls the backend service and transforms DTO into model objects.
-	 * 
-	 * @param dicomData
-	 * @param equipmentDicom
-	 * @throws Exception 
+	 * @param uploadJob
+	 * @return
+	 * @throws Exception
 	 */
+	@SuppressWarnings("removal")
 	private List<Study> getStudiesWithStudyCards(final UploadJob uploadJob) throws Exception {
 		List<Study> studies = shanoirUploaderServiceClient.findStudiesNamesAndCenters();
 		if (studies != null) {
@@ -114,7 +115,9 @@ public class ImportDialogOpener {
 			List<AcquisitionEquipment> acquisitionEquipments = shanoirUploaderServiceClient.findAcquisitionEquipments();
 			logger.info("findAcquisitionEquipments: " + acquisitionEquipments.size() + " equipments found.");
 			List<StudyCard> studyCards = getAllStudyCards(studies);
-			logger.info("getAllStudyCards for studies: " + studyCards.size() + " studycards found.");
+			logger.info("getAllStudyCards for studies: " + studyCards.size() + " study cards found.");
+			List<QualityCard> qualityCards = getAllQualityCards(studies);
+			logger.info("getAllQualityCards for studies: " + qualityCards.size() + " quality cards found.");
 			for (Iterator<Study> iterator = studies.iterator(); iterator.hasNext();) {
 				Study study = (Study) iterator.next();
 				study.setCompatible(new Boolean(false));
@@ -167,6 +170,15 @@ public class ImportDialogOpener {
 					}
 					study.setStudyCards(studyCardsStudy);
 				}
+				// Setting quality cards with matching study and filtering only quality cards to be apply at import
+				List<QualityCard> qualityCardsStudy = new ArrayList<QualityCard>();
+				for (Iterator<QualityCard> itQualityCards = qualityCards.iterator(); itQualityCards.hasNext();) {
+					QualityCard qualityCard = (QualityCard) itQualityCards.next();
+					if (study.getId().equals(qualityCard.getStudyId()) && qualityCard.getToCheckAtImport()) {
+						qualityCardsStudy.add(qualityCard);
+					}
+				}
+				study.setQualityCards(qualityCardsStudy);
 			}
 			return studies;
 		} else {
@@ -185,11 +197,14 @@ public class ImportDialogOpener {
 	}
 
 	/**
+	 * Insert items into Study infos combo boxes
 	 * @param studiesWithStudyCards
-	 */
-	private void updateImportDialogForStudyAndStudyCard(List<Study> studiesWithStudyCards) {
+	 * @param qualityCards
+	*/
+	private void updateImportDialogForStudyInformations(List<Study> studiesWithStudyCards) {
 		importDialog.studyCB.removeAllItems();
 		importDialog.studyCardCB.removeAllItems();
+		importDialog.qualityCardCB.removeAllItems();
 		if (studiesWithStudyCards != null && !studiesWithStudyCards.isEmpty()) {
 			boolean firstCompatibleStudyFound = false;
 			for (Study study : studiesWithStudyCards) {
@@ -208,10 +223,13 @@ public class ImportDialogOpener {
 							firstCompatibleStudyCardFound = true;
 						}
 					}
+					for (QualityCard qualityCard : study.getQualityCards()) {
+						importDialog.qualityCardCB.setSelectedItem(qualityCard);
+					}
 				}
 			}
 			if (!firstCompatibleStudyFound) {
-				// this selectItem adds study cards to the stuyCardCB in case of no
+				// this selectItem adds study cards to the studyCardCB in case of no
 				// compatible study found, see ImportStudyAndStudyCardCBItemListener
 				Study firstStudy = studiesWithStudyCards.get(0);
 				importDialog.studyCB.setSelectedItem(firstStudy);
@@ -318,4 +336,18 @@ public class ImportDialogOpener {
 		importDialog.mrExaminationCommentTF.setText(studyDescription);
 	}
 
+	/**
+	 * Get all QualityCards of all studies
+	 * @param studies
+	 * @return
+	 * @throws Exception
+	*/
+	private List<QualityCard> getAllQualityCards(List<Study> studies) throws Exception {
+		List<QualityCard> qualityCards = new ArrayList<QualityCard>();
+		for (Iterator<Study> iterator = studies.iterator(); iterator.hasNext();) {
+			Study study = (Study) iterator.next();
+				qualityCards.addAll(shanoirUploaderServiceClient.findQualityCardsByStudyId(study.getId()));
+		}
+		return qualityCards;
+	}
 }
