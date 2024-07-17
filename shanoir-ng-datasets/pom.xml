@@ -48,6 +48,11 @@
 			<artifactId>shanoir-ng-study-rights</artifactId>
 			<version>3.2.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.shanoir-ng</groupId>
+			<artifactId>shanoir-ng-import</artifactId>
+			<version>3.2.2</version>
+		</dependency>
 
 		<!-- gson -->
 		<dependency>
@@ -158,6 +163,14 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- Used here for ShanoirUploader: creae an additional single jar to be used by ShUp -->
+	        <plugin>
+	            <groupId>org.springframework.boot</groupId>
+	            <artifactId>spring-boot-maven-plugin</artifactId>
+	            <configuration>
+	                <classifier>exec</classifier>
+	            </configuration>
+	        </plugin>
 			<!-- Copy shanoir-ng-datasets.jar for docker-compose up running -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

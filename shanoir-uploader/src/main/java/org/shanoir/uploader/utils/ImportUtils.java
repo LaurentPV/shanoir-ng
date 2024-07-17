@@ -16,6 +16,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.apache.log4j.Logger;
+import org.shanoir.ng.examination.model.Examination;
 import org.shanoir.ng.importer.dicom.ImagesCreatorAndDicomFileAnalyzerService;
 import org.shanoir.ng.importer.model.ImportJob;
 import org.shanoir.ng.importer.model.Instance;
@@ -315,4 +316,13 @@ public class ImportUtils {
 		return allFileNames;
 	}
 
+	public static Examination convertExamination(org.shanoir.uploader.model.rest.Examination exam){
+		Examination examination = new Examination();
+		examination.setExaminationDate(Util.convertDateToLocalDate(exam.getExaminationDate()));
+		examination.setCenterId(exam.getCenterId());
+		examination.setComment(exam.getComment());
+		examination.setExaminationDate(Util.convertDateToLocalDate(exam.getExaminationDate()));
+		examination.setNote(exam.getNote());
+		return examination;
+	}
 }

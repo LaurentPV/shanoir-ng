@@ -12,7 +12,9 @@ import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
 import org.apache.log4j.Logger;
+import org.shanoir.ng.importer.dto.mapper.ImportJobMapper;
 import org.shanoir.ng.importer.model.ImportJob;
+import org.shanoir.ng.importer.service.ImporterService;
 import org.shanoir.uploader.ShUpConfig;
 import org.shanoir.uploader.ShUpOnloadConfig;
 import org.shanoir.uploader.gui.ImportDialog;
@@ -55,6 +57,10 @@ public class ImportFinishActionListener implements ActionListener {
 	
 	private ImportStudyAndStudyCardCBItemListener importStudyAndStudyCardCBILNG;
 
+	private ImporterService importerService;
+
+	private ImportJobMapper importJobMapper;
+
 	public ImportFinishActionListener(final MainWindow mainWindow, UploadJob uploadJob, File uploadFolder, Subject subject,
 			ImportStudyAndStudyCardCBItemListener importStudyAndStudyCardCBILNG) {
 		this.mainWindow = mainWindow;
@@ -94,7 +100,8 @@ public class ImportFinishActionListener implements ActionListener {
 		// block further action
 		((JButton) event.getSource()).setEnabled(false);
 		mainWindow.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-
+	
+		
 		/**
 		 * Handle subject here: creation or use existing
 		 */
@@ -148,8 +155,8 @@ public class ImportFinishActionListener implements ActionListener {
 		}
 		
 		Long examinationId = null;
+		Examination examinationDTO = new Examination();
 		if (mainWindow.importDialog.mrExaminationNewExamCB.isSelected()) {
-			Examination examinationDTO = new Examination();
 			examinationDTO.setStudyId(study.getId());
 			examinationDTO.setSubjectId(subject.getId());
 			IdName center = (IdName) mainWindow.importDialog.mrExaminationCenterCB.getSelectedItem();
@@ -171,7 +178,7 @@ public class ImportFinishActionListener implements ActionListener {
 				logger.info("Auto-Import: examination created on server with ID: " + examinationId);
 			}
 		} else {
-			Examination examinationDTO = (Examination) mainWindow.importDialog.mrExaminationExistingExamCB.getSelectedItem();
+			examinationDTO = (Examination) mainWindow.importDialog.mrExaminationExistingExamCB.getSelectedItem();
 			examinationId = examinationDTO.getId();
 			logger.info("Auto-Import: examination used on server with ID: " + examinationId);
 		}
@@ -180,6 +187,11 @@ public class ImportFinishActionListener implements ActionListener {
 		 * 3. Fill import-job.json
 		 */
 		ImportJob importJob = ImportUtils.prepareImportJob(uploadJob, subject.getName(), subject.getId(), examinationId, (Study) mainWindow.importDialog.studyCB.getSelectedItem(), (StudyCard) mainWindow.importDialog.studyCardCB.getSelectedItem());
+		
+		importerService.checkQuality(importJobMapper.importJobToImportJobDTO(importJob));
+		// Lire les exam Attributes depuis le workfolder
+		// Apply quality card rules
+
 		Runnable runnable = new ImportFinishRunnable(uploadJob, uploadFolder, importJob, subject.getName());
 		Thread thread = new Thread(runnable);
 		thread.start();

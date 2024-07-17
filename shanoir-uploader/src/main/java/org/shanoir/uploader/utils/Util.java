@@ -599,6 +599,10 @@ public final class Util {
 	public static LocalDate convertStringToLocalDate(final String date) {
 		DateTimeFormatter pattern = DateTimeFormatter.ofPattern(DATE_PATTERN);
 		return LocalDate.parse(date, pattern);
-	}	
+	}
+
+	public static LocalDate convertDateToLocalDate(final Date date){
+		return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();	
+	}
 
 }

@@ -106,7 +106,7 @@ public class CardsProcessingService {
         if (qualityCard == null) throw new IllegalArgumentException("qualityCard can't be null");
 		if (examination == null ) throw new IllegalArgumentException("examination can't be null");
         LOG.debug("Quality check for examination " + examination.getId() + " started");
-		if (qualityCard.getStudyId() != examination.getStudy().getId()) throw new IllegalStateException("study and studycard ids don't match");
+		if (qualityCard.getStudyId() != examination.getStudy().getId()) throw new IllegalStateException("study and qualitycard ids don't match");
 		if (CollectionUtils.isNotEmpty(qualityCard.getRules())) {
 		    QualityCardResult result = new QualityCardResult();
             if (updateTags) {
