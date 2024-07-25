@@ -297,7 +297,7 @@ public class ImporterService {
         return generatedAcquisitions;
     }
 
-    private QualityCardResult checkQuality(ExaminationData examination, ImportJob importJob) throws ShanoirException {
+    public QualityCardResult checkQuality(ExaminationData examination, ImportJob importJob) throws ShanoirException {
         List<QualityCard> qualityCards = qualityCardService.findByStudy(examination.getStudyId());   
         if (!hasQualityChecksAtImport(qualityCards)) {
             return new QualityCardResult();

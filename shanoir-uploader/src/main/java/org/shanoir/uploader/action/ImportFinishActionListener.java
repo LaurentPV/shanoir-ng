@@ -15,6 +15,8 @@ import org.apache.log4j.Logger;
 import org.shanoir.ng.importer.dto.mapper.ImportJobMapper;
 import org.shanoir.ng.importer.model.ImportJob;
 import org.shanoir.ng.importer.service.ImporterService;
+import org.shanoir.ng.shared.exception.ShanoirException;
+import org.shanoir.ng.studycard.dto.QualityCardResult;
 import org.shanoir.ng.studycard.model.ExaminationData;
 import org.shanoir.uploader.ShUpConfig;
 import org.shanoir.uploader.ShUpOnloadConfig;
@@ -189,9 +191,23 @@ public class ImportFinishActionListener implements ActionListener {
 		 * 3. Fill import-job.json
 		 */
 		ImportJob importJob = ImportUtils.prepareImportJob(uploadJob, subject.getName(), subject.getId(), examinationId, (Study) mainWindow.importDialog.studyCB.getSelectedItem(), (StudyCard) mainWindow.importDialog.studyCardCB.getSelectedItem());
-		
-		ExaminationData examination = new ExaminationData(examinationDTO);
-		importerService.checkQuality(importJobMapper.importJobToImportJobDTO(importJob));
+		org.shanoir.ng.examination.model.Examination examination = ImportUtils.convertExamination(examinationDTO);
+		ExaminationData examData = new ExaminationData(examination);
+		QualityCardResult qualityCardResult = null;
+		try {
+			qualityCardResult = importerService.checkQuality(examData, importJobMapper.importJobToImportJobDTO(importJob));
+			if(qualityCardResult.hasError()) {
+				JOptionPane.showMessageDialog(mainWindow.frame,
+						ShUpConfig.resourceBundle.getString("shanoir.uploader.import.error.quality.card.message"),
+						"Error", JOptionPane.ERROR_MESSAGE);
+				mainWindow.setCursor(null); // turn off the wait cursor
+				((JButton) event.getSource()).setEnabled(true);
+				return;
+			}
+		} catch (ShanoirException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//Créer un datasets Examination a partir du Shup examination et executer generateAcquisition() sans executer la study card
 		//Set les datasetAcquisitions générés dans l'ExaminationData crée a partir du Examination datasets
 		//Executer checkQuality sur l'ExaminationData 
