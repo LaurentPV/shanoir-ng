@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.shanoir.ng.importer.dto.mapper.ImportJobMapper;
 import org.shanoir.ng.importer.model.ImportJob;
 import org.shanoir.ng.importer.service.ImporterService;
+import org.shanoir.ng.studycard.model.ExaminationData;
 import org.shanoir.uploader.ShUpConfig;
 import org.shanoir.uploader.ShUpOnloadConfig;
 import org.shanoir.uploader.gui.ImportDialog;
@@ -60,6 +61,7 @@ public class ImportFinishActionListener implements ActionListener {
 	private ImporterService importerService;
 
 	private ImportJobMapper importJobMapper;
+
 
 	public ImportFinishActionListener(final MainWindow mainWindow, UploadJob uploadJob, File uploadFolder, Subject subject,
 			ImportStudyAndStudyCardCBItemListener importStudyAndStudyCardCBILNG) {
@@ -188,10 +190,14 @@ public class ImportFinishActionListener implements ActionListener {
 		 */
 		ImportJob importJob = ImportUtils.prepareImportJob(uploadJob, subject.getName(), subject.getId(), examinationId, (Study) mainWindow.importDialog.studyCB.getSelectedItem(), (StudyCard) mainWindow.importDialog.studyCardCB.getSelectedItem());
 		
+		ExaminationData examination = new ExaminationData(examinationDTO);
 		importerService.checkQuality(importJobMapper.importJobToImportJobDTO(importJob));
-		// Lire les exam Attributes depuis le workfolder
-		// Apply quality card rules
-
+		//Créer un datasets Examination a partir du Shup examination et executer generateAcquisition() sans executer la study card
+		//Set les datasetAcquisitions générés dans l'ExaminationData crée a partir du Examination datasets
+		//Executer checkQuality sur l'ExaminationData 
+		//Récupérer la QualityCardResult
+		// envoyer le job au serveur avec le QualityTag associé pour appliquer le resultat de la quality card sans l'executer une seconde fois.
+		
 		Runnable runnable = new ImportFinishRunnable(uploadJob, uploadFolder, importJob, subject.getName());
 		Thread thread = new Thread(runnable);
 		thread.start();
