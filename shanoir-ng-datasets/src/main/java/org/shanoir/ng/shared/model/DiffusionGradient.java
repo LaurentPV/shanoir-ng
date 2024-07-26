@@ -79,6 +79,13 @@ public class DiffusionGradient extends AbstractEntity {
 		this.diffusionGradientOrientationZ = dg.getDiffusionGradientOrientationZ();
 	}
 
+	public DiffusionGradient(org.shanoir.ng.importer.dto.DiffusionGradient dg) {
+		this.diffusionGradientBValue = dg.getDiffusionGradientBValue();
+		this.diffusionGradientOrientationX = dg.getDiffusionGradientOrientationX();
+		this.diffusionGradientOrientationY = dg.getDiffusionGradientOrientationY();
+		this.diffusionGradientOrientationZ = dg.getDiffusionGradientOrientationZ();
+	}
+	
 	/**
 	 * @return the mrProtocol
 	 */

@@ -12,7 +12,7 @@
  * along with this program. If not, see https://www.gnu.org/licenses/gpl-3.0.html
  */
 
-package org.shanoir.ng.importer.dto;
+package org.shanoir.ng.importer.model;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.shanoir.ng.shared.dicom.EchoTime;
-import org.shanoir.ng.shared.model.DiffusionGradient;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -29,11 +28,11 @@ public class Dataset {
 	@JsonProperty("name")
 	private String name;
 	
-	private List<ExpressionFormat> expressionFormats;
-	
+	private List<ExpressionFormat> expressionFormats = new ArrayList<>();
+
 	@JsonProperty("diffusionGradients")
 	private List<DiffusionGradient> diffusionGradients;
-
+	
 	@JsonProperty("repetitionTimes")
 	public Set<Double> repetitionTimes;
 	
@@ -44,13 +43,7 @@ public class Dataset {
 	public Set<EchoTime> echoTimes;
 	
 	@JsonProperty("flipAngles")
-	public Set<String> flipAngles;
-	
-	@JsonProperty("bValues")
-	private List<Double> bValues;
-	
-	@JsonProperty("bVectors")
-	private List<Double> bVectors;
+	public Set<Double> flipAngles;
 
 	@JsonProperty("firstImageSOPInstanceUID")
 	private String firstImageSOPInstanceUID;
@@ -70,23 +63,7 @@ public class Dataset {
 	public void setExpressionFormats(List<ExpressionFormat> expressionFormats) {
 		this.expressionFormats = expressionFormats;
 	}
-	
-	public List<Double> getbValues() {
-		return bValues;
-	}
 
-	public void setbValues(List<Double> bValues) {
-		this.bValues = bValues;
-	}
-
-	public List<Double> getbVectors() {
-		return bVectors;
-	}
-
-	public void setbVectors(List<Double> bVectors) {
-		this.bVectors = bVectors;
-	}
-	
 	public List<DiffusionGradient> getDiffusionGradients() {
 		if (diffusionGradients == null) {
 			diffusionGradients = new ArrayList<>();
@@ -97,7 +74,7 @@ public class Dataset {
 	public void setDiffusionGradients(List<DiffusionGradient> diffusionGradients) {
 		this.diffusionGradients = diffusionGradients;
 	}
-	
+
 	public Set<Double> getRepetitionTimes() {
 		if (repetitionTimes == null) {
 			this.repetitionTimes = new HashSet<>();
@@ -120,14 +97,14 @@ public class Dataset {
 		this.inversionTimes = inversionTimes;
 	}
 
-	public Set<String> getFlipAngles() {
+	public Set<Double> getFlipAngles() {
 		if (flipAngles == null) {
 			this.flipAngles = new HashSet<>();
 		}
 		return this.flipAngles;
 	}
 
-	public void setFlipAngles(Set<String> flipAngles) {
+	public void setFlipAngles(Set<Double> flipAngles) {
 		this.flipAngles = flipAngles;
 	}
 
@@ -143,7 +120,7 @@ public class Dataset {
 	}
 
 	public String getFirstImageSOPInstanceUID() {
-		return this.firstImageSOPInstanceUID;
+		return firstImageSOPInstanceUID;
 	}
 
 	public void setFirstImageSOPInstanceUID(String firstImageSOPInstanceUID) {

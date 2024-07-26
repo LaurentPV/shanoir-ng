@@ -75,8 +75,12 @@
 			<version>3.2.2</version>
 			<exclusions>
 			    <exclusion>
-			        <groupId>*</groupId>
-			        <artifactId>*</artifactId>
+			        <groupId>org.shanoir-ng</groupId>
+					<artifactId>shanoir-ng-ms-common</artifactId>
+			    </exclusion>
+				<exclusion>
+			        <groupId>org.shanoir-ng</groupId>
+					<artifactId>shanoir-ng-import</artifactId>
 			    </exclusion>
 			</exclusions>
 		</dependency>

@@ -48,11 +48,6 @@
 			<artifactId>shanoir-ng-study-rights</artifactId>
 			<version>3.2.2</version>
 		</dependency>
-		<dependency>
-			<groupId>org.shanoir-ng</groupId>
-			<artifactId>shanoir-ng-import</artifactId>
-			<version>3.2.2</version>
-		</dependency>
 
 		<!-- gson -->
 		<dependency>
@@ -154,7 +149,6 @@
 					<profiles>
 						<profile>${spring.active.profile}</profile>
 					</profiles>
-					<classifier>exec</classifier>
 				</configuration>
 				<executions>
 					<execution>

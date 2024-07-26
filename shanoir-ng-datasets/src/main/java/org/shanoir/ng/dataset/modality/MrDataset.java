@@ -16,10 +16,7 @@ package org.shanoir.ng.dataset.modality;
 
 import jakarta.persistence.*;
 import org.shanoir.ng.dataset.model.Dataset;
-import org.shanoir.ng.datasetacquisition.model.mr.MrDatasetAcquisition;
-import org.shanoir.ng.datasetacquisition.model.mr.MrProtocol;
 import org.shanoir.ng.shared.model.*;
-import org.xmlunit.diff.Diff;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
