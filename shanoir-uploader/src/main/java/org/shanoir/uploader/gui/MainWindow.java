@@ -333,7 +333,7 @@ public class MainWindow extends JFrame {
 		gBC_pRB.gridy = 1;
 		queryPanel.add(pRB, gBC_pRB);
 
-		sRB = new JRadioButton("Study");
+		sRB = new JRadioButton(resourceBundle.getString("shanoir.uploader.queryLevelStudy"));
 		queryLevelRG.add(sRB);
 		GridBagConstraints gBC_sRB = new GridBagConstraints();
 		gBC_sRB.insets = new Insets(2, 2, 0, 2);
@@ -768,10 +768,10 @@ public class MainWindow extends JFrame {
 				.getResource("images/copyLastNameToBirthName.16x16.png"));
 		birthNameCopyButton = new JButton(copyIcon);
 		GridBagConstraints gBCBithNameCopyButton = new GridBagConstraints();
-		gBCBithNameCopyButton.anchor = GridBagConstraints.EAST;
 		gBCBithNameCopyButton.insets = new Insets(10, 10, 10, 10);
 		gBCBithNameCopyButton.gridx = 3;
-		gBCBithNameCopyButton.gridy = 2;
+		gBCBithNameCopyButton.gridy = 3;
+		birthNameCopyButton.setToolTipText(resourceBundle.getString("shanoir.uploader.copyLastNameToBirthName"));
 		birthNameCopyButton.setEnabled(false);
 		editPanel.add(birthNameCopyButton, gBCBithNameCopyButton);
 
@@ -861,38 +861,38 @@ public class MainWindow extends JFrame {
 		gBCSexLabel.gridy = 5;
 		editPanel.add(sexLabel, gBCSexLabel);
 		sexRG = new ButtonGroup();
-		fSexR = new JRadioButton("F");
+		fSexR = new JRadioButton(resourceBundle.getString("shanoir.uploader.sex.F"));
 		fSexR.setEnabled(false);
 		sexRG.add(fSexR);
 		editPanel.add(fSexR);
-		mSexR = new JRadioButton("M");
+		mSexR = new JRadioButton(resourceBundle.getString("shanoir.uploader.sex.M"));
 		mSexR.setEnabled(false);
 		sexRG.add(mSexR);
 		editPanel.add(mSexR);
-		oSexR = new JRadioButton("O");
+		oSexR = new JRadioButton(resourceBundle.getString("shanoir.uploader.sex.O"));
 		oSexR.setEnabled(false);
 		sexRG.add(oSexR);
 		editPanel.add(oSexR);
 		GridBagConstraints gBCFSexR = new GridBagConstraints();
 		gBCFSexR.insets = new Insets(10, 10, 10, 10);
+		gBCFSexR.anchor = GridBagConstraints.WEST;
 		gBCFSexR.fill = GridBagConstraints.HORIZONTAL;
 		gBCFSexR.gridx = 1;
 		gBCFSexR.gridy = 5;
-		gBCFSexR.weightx = 1.0;
 		editPanel.add(fSexR, gBCFSexR);
 		GridBagConstraints gBCMSexR = new GridBagConstraints();
 		gBCMSexR.insets = new Insets(10, 10, 10, 10);
+		gBCFSexR.anchor = GridBagConstraints.WEST;
 		gBCMSexR.fill = GridBagConstraints.HORIZONTAL;
 		gBCMSexR.gridx = 2;
 		gBCMSexR.gridy = 5;
-		gBCMSexR.weightx = 1.0;
 		editPanel.add(mSexR, gBCMSexR);
 		GridBagConstraints gBCOSexR = new GridBagConstraints();
 		gBCOSexR.insets = new Insets(10, 10, 10, 10);
+		gBCFSexR.anchor = GridBagConstraints.WEST;
 		gBCOSexR.fill = GridBagConstraints.HORIZONTAL;
 		gBCOSexR.gridx = 3;
 		gBCOSexR.gridy = 5;
-		gBCOSexR.weightx = 1.0;
 		editPanel.add(oSexR, gBCOSexR);
 
 		/**
