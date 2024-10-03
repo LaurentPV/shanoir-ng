@@ -186,18 +186,7 @@ public class FindDicomActionListener extends JPanel implements ActionListener {
 					patientNameFinal = lastName.toUpperCase();
 
 				if (!exitFlag) {
-					String modality = null;
-					if (!mainWindow.noRB.isSelected()) {
-						if (mainWindow.mrRB.isSelected()) {
-							modality = "MR";
-						} else if (mainWindow.ctRB.isSelected()) {
-							modality = "CT";
-						} else if (mainWindow.ptRB.isSelected()) {
-							modality = "PT";
-						} else if (mainWindow.nmRB.isSelected()) {
-							modality = "NM";
-						}
-					}
+					String modality = mainWindow.modality;
 					boolean studyRootQuery = false;
 					if (mainWindow.sRB.isSelected()) {
 						studyRootQuery = true;
