@@ -1,6 +1,5 @@
 package org.shanoir.ng.dicom.web.service;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,7 +7,6 @@ import java.io.InputStream;
 import org.apache.hc.client5.http.classic.methods.HttpDelete;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
-import org.apache.hc.client5.http.entity.mime.ContentBody;
 import org.apache.hc.client5.http.entity.mime.FileBody;
 import org.apache.hc.client5.http.entity.mime.InputStreamBody;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
@@ -308,8 +306,8 @@ public class DICOMWebService {
 		LOG.info("Start: STOW-RS sending dicom file input stream to PACS.");
 		try {
 			// create content body
-			ContentBody contentBody = new InputStreamBody(
-					new ByteArrayInputStream(inputStream.readAllBytes()), ContentType.create(CONTENT_TYPE_DICOM));
+			InputStreamBody contentBody = new InputStreamBody(
+					inputStream, ContentType.create(CONTENT_TYPE_DICOM));
 			// build MultipartPart
 			MultipartPartBuilder partBuilder = MultipartPartBuilder.create();
 			partBuilder.addHeader(CONTENT_TYPE, CONTENT_TYPE_DICOM);
