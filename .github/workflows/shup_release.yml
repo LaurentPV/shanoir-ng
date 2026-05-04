@@ -34,7 +34,7 @@ jobs:
       - name: Get latest NG tag and generate SHUP release tag
         id: get_tag
         run: |
-          version_part="2.10.1beta"
+          version_part="2.10.1"
           new_tag="SHUP_v${version_part}"
           echo "version_part=$version_part" >> "$GITHUB_OUTPUT"
           echo "new_tag=$new_tag" >> "$GITHUB_OUTPUT"
