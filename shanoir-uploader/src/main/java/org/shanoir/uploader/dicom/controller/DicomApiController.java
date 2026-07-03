@@ -7,15 +7,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 import org.shanoir.ng.importer.dicom.ImagesCreatorAndDicomFileAnalyzerService;
 import org.shanoir.ng.importer.model.ImportJob;
 import org.shanoir.ng.importer.model.ImportJobStatus;
 import org.shanoir.ng.importer.model.Patient;
-import org.shanoir.ng.importer.model.Serie;
-import org.shanoir.ng.importer.model.Study;
 import org.shanoir.uploader.ShUpConfig;
 import org.shanoir.uploader.ShUpOnloadConfig;
 import org.shanoir.uploader.action.DownloadOrCopyRunnable;
@@ -25,15 +21,13 @@ import org.shanoir.uploader.action.event.DicomClientReadyEvent;
 import org.shanoir.uploader.dicom.DicomServerClient;
 import org.shanoir.uploader.dicom.dto.ConfigDTO;
 import org.shanoir.uploader.dicom.query.Media;
-import org.shanoir.uploader.dicom.query.PatientTreeNode;
-import org.shanoir.uploader.dicom.query.SerieTreeNode;
-import org.shanoir.uploader.dicom.query.StudyTreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -62,7 +56,7 @@ public class DicomApiController implements ApplicationListener<DicomClientReadyE
 
     public DicomApiController(Lock importLock, ImagesCreatorAndDicomFileAnalyzerService dicomFileAnalyzer) {
         this.importLock = importLock;
-        this.dicomFileAnalyzer = dicomFileAnalyzer;
+        this.dicomFileAnalyzer = new ImagesCreatorAndDicomFileAnalyzerService();
     }
 
     @Override
@@ -184,7 +178,16 @@ public class DicomApiController implements ApplicationListener<DicomClientReadyE
             logger.error("An error occured while running the thread.", e);
             return ResponseEntity.internalServerError().build();
         }
-    return ResponseEntity.accepted().body(Map.of("jobId", jobId));
+    return ResponseEntity.accepted().body(Map.of("importJobId", jobId));
+    }
+
+    @GetMapping("/importJobs/{jobId}/progress")
+    public ResponseEntity<ImportJobStatus> getProgress(@PathVariable String jobId) {
+        ImportJobStatus status = statusStore.get(jobId);
+        if (status == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(status);
     }
 
     private void setDicomProperties(Properties dicomServerProperties, ConfigDTO config) {

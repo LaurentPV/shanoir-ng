@@ -16,10 +16,27 @@ package org.shanoir.uploader;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
-@ComponentScan(basePackages = "org.shanoir.uploader")
+@ComponentScan(
+    basePackages = {"org.shanoir.uploader", "org.shanoir.ng.importer.dicom", "org.shanoir.ng.importer.model"},
+    excludeFilters =  { 
+        @ComponentScan.Filter(
+            type = FilterType.ASSIGNABLE_TYPE,
+            classes = org.shanoir.ng.shared.event.ShanoirEventService.class
+        ),
+        @ComponentScan.Filter(
+            type = FilterType.ASSIGNABLE_TYPE,
+            classes = org.shanoir.ng.importer.dicom.query.DicomStoreSCPServer.class
+        ),
+        @ComponentScan.Filter(
+            type = FilterType.ASSIGNABLE_TYPE,
+            classes = org.shanoir.ng.importer.dicom.query.QueryPACSService.class
+        )
+    }
+)
 @EnableScheduling
 public class ShanoirUploaderSpringConfig {
 

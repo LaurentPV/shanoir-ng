@@ -79,7 +79,7 @@ public class ImagesCreatorAndDicomFileAnalyzerService {
 
     private static final String SERIES_NUMBER_0 = "0";
 
-    @Autowired
+    @Autowired(required = false)
     private ShanoirEventService eventService;
 
     public void createImagesAndAnalyzeDicomFiles(List<Patient> patients, String folderFileAbsolutePath, boolean isImportFromPACS, ShanoirEvent event, boolean isFromShUpQualityControl)
@@ -100,7 +100,9 @@ public class ImagesCreatorAndDicomFileAnalyzerService {
                     if (!serie.isIgnored()) {
                         if (event != null) {
                             event.setMessage("Creating images and analyzing DICOM files for serie [" + (serie.getSeriesDescription() == null ? serie.getSeriesInstanceUID() : serie.getSeriesDescription()) + "] " + cpt + "/" + nbSeries + ")");
-                            eventService.publishEvent(event);
+                            if (eventService != null) {
+                                eventService.publishEvent(event);
+                            }
                         }
                         try {
                             filterAndCreateImages(folderFileAbsolutePath, serie, isImportFromPACS, isFromShUpQualityControl);
@@ -136,7 +138,9 @@ public class ImagesCreatorAndDicomFileAnalyzerService {
         serie.setSelected(false);
         if (event != null) {
             event.setMessage("Error with serie [" + (serie.getSeriesDescription() == null ? serie.getSeriesInstanceUID() : serie.getSeriesDescription()) + "] " + cpt + "/" + nbSeries + ")");
-            eventService.publishEvent(event);
+            if (eventService != null) {
+                eventService.publishEvent(event);
+            }
         }
     }
 
