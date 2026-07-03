@@ -19,12 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
+import java.util.function.IntConsumer;
 
 import org.shanoir.ng.importer.dicom.ImagesCreatorAndDicomFileAnalyzerService;
 import org.shanoir.ng.importer.model.ImportJob;
@@ -57,8 +52,6 @@ public class DownloadOrCopyRunnable implements Runnable {
 
     private boolean isFromPACS;
 
-    private boolean isTableImport;
-
     private IDicomServerClient dicomServerClient;
 
     private ImagesCreatorAndDicomFileAnalyzerService dicomFileAnalyzer;
@@ -67,29 +60,29 @@ public class DownloadOrCopyRunnable implements Runnable {
 
     private Map<String, ImportJob> importJobs;
 
-    private JFrame frame;
+    private final ImportProgressListener progressListener;
 
-    private JProgressBar downloadProgressBar;
-
-    public DownloadOrCopyRunnable(boolean isFromPACS, boolean isTableImport, JFrame frame, JProgressBar downloadProgressBar,
+    public DownloadOrCopyRunnable(boolean isFromPACS,
             final IDicomServerClient dicomServerClient, ImagesCreatorAndDicomFileAnalyzerService dicomFileAnalyzer,
-            final String filePathDicomDir, Map<String, ImportJob> importJobs) {
+            final String filePathDicomDir, Map<String, ImportJob> importJobs, ImportProgressListener progressListener) {
         this.isFromPACS = isFromPACS;
-        this.isTableImport = isTableImport;
-        this.frame = frame;
-        this.downloadProgressBar = downloadProgressBar;
         this.dicomFileAnalyzer = dicomFileAnalyzer;
         this.dicomServerClient = dicomServerClient; // used with PACS import
         if (!isFromPACS && filePathDicomDir != null) {
             this.filePathDicomDir = new String(filePathDicomDir); // used with CD/DVD import
         }
         this.importJobs = importJobs;
+        this.progressListener = progressListener;
     }
 
     @Override
     public void run() {
-        LOG.info(importJobs.size() + " DICOM study(ies) selected for download or copy.");
+        int totalStudies = importJobs.size();
+        LOG.info(totalStudies + " DICOM study(ies) selected for download or copy.");
         StringBuilder downloadOrCopyReportSummary = new StringBuilder();
+        boolean globalSuccess = true;
+        int processedStudies = 0;
+
         for (String studyInstanceUID : importJobs.keySet()) {
             StringBuilder downloadOrCopyReportPerStudy = new StringBuilder();
             ImportJob importJob = importJobs.get(studyInstanceUID);
@@ -102,13 +95,21 @@ public class DownloadOrCopyRunnable implements Runnable {
             List<Serie> selectedSeries = importJob.getSelectedSeries();
             downloadOrCopyReportPerStudy.append(selectedSeries.size() + " series selected for download or copy.\n\n");
             List<String> allFileNames = null;
-            downloadProgressBar.setValue(0);
+
+            final int finalProcessedStudies = processedStudies;
+            final String studyDescription = importJob.getStudy().getStudyDescription();
+            IntConsumer progressCallback = percentWithinStudy -> {
+                int globalPercent = Math.round(((finalProcessedStudies * 100f) + percentWithinStudy) / totalStudies);
+                progressListener.onProgress(globalPercent,
+                        "Study " + (finalProcessedStudies + 1) + "/" + totalStudies + " - " + studyDescription);
+            };
+
             try {
                 /**
                  * 1. Download from PACS or copy from CD/DVD/local file system
                  */
                 allFileNames = ImportUtils.downloadOrCopyFilesIntoUploadFolder(
-                        this.isFromPACS, downloadProgressBar, downloadOrCopyReportPerStudy, studyInstanceUID, selectedSeries,
+                        this.isFromPACS, progressCallback, downloadOrCopyReportPerStudy, studyInstanceUID, selectedSeries,
                         uploadFolder, dicomFileAnalyzer, dicomServerClient, filePathDicomDir);
                 /**
                  * 2. Fill MRI information into all series from first DICOM file of each serie
@@ -130,6 +131,7 @@ public class DownloadOrCopyRunnable implements Runnable {
 
             if (allFileNames == null) {
                 importJob.setUploadState(UploadState.ERROR);
+                globalSuccess = false;
             } else {
                 importJob.setUploadState(UploadState.READY);
             }
@@ -154,25 +156,8 @@ public class DownloadOrCopyRunnable implements Runnable {
                             + Utils.sha256(importJob.getPatient().getPatientName()));
 
             downloadOrCopyReportSummary.append(downloadOrCopyReportPerStudy.toString() + "\n\n");
+            processedStudies++;
         }
-        if (isTableImport) {
-            LOG.info(downloadOrCopyReportSummary.toString());
-        } else {
-            /**
-             * Display downloadOrCopy summary to user.
-             */
-            JTextArea textArea = new JTextArea(downloadOrCopyReportSummary.toString());
-            textArea.setEditable(false);
-            textArea.setWrapStyleWord(true);
-            textArea.setLineWrap(true);
-            textArea.setCaretPosition(0);
-            JScrollPane scrollPane = new JScrollPane(textArea);
-            scrollPane.setPreferredSize(new java.awt.Dimension(650, 550));
-            JOptionPane.showMessageDialog(
-                    frame,
-                    scrollPane,
-                    "Download or copy report",
-                    JOptionPane.INFORMATION_MESSAGE);
-        }
+    progressListener.onComplete(downloadOrCopyReportSummary.toString(), globalSuccess);
     }
 }

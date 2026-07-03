@@ -23,6 +23,9 @@ import java.util.ResourceBundle;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import org.shanoir.ng.exchange.imports.subject.IdentifierCalculator;
 import org.shanoir.ng.importer.dicom.ImagesCreatorAndDicomFileAnalyzerService;
@@ -136,10 +139,32 @@ public class DownloadOrCopyActionListener implements ActionListener {
          * 3. Download from PACS or copy from CD/DVD and write import-job.json
          */
         final String filePathDicomDir = mainWindow.getFindDicomActionListener().getFilePathDicomDir();
-        Runnable runnable = new DownloadOrCopyRunnable(mainWindow.isFromPACS, false, mainWindow.frame, mainWindow.downloadProgressBar, dicomServerClient, dicomFileAnalyzer,  filePathDicomDir, importJobs);
+        ImportProgressListener swingListener = new ImportProgressListener() {
+            @Override
+            public void onProgress(int percentage, String currentStep) {
+                SwingUtilities.invokeLater(() -> mainWindow.downloadProgressBar.setValue(percentage));
+            }
+
+            @Override
+            public void onComplete(String reportSummary, boolean success) {
+                SwingUtilities.invokeLater(() -> {
+                    JTextArea textArea = new JTextArea(reportSummary);
+                    textArea.setEditable(false);
+                    textArea.setWrapStyleWord(true);
+                    textArea.setLineWrap(true);
+                    textArea.setCaretPosition(0);
+                    JScrollPane scrollPane = new JScrollPane(textArea);
+                    scrollPane.setPreferredSize(new java.awt.Dimension(650, 550));
+                    JOptionPane.showMessageDialog(mainWindow.frame, scrollPane, "Download or copy report", JOptionPane.INFORMATION_MESSAGE);
+                });
+            }
+        };
+
         if (lock.tryLock()) {
             try {
-                Thread thread = new Thread(runnable);
+                Thread thread = new Thread(new DownloadOrCopyRunnable(
+                    mainWindow.isFromPACS, dicomServerClient, dicomFileAnalyzer, filePathDicomDir, importJobs, swingListener
+                ));
                 thread.start();
             } catch (Exception e) {
                 LOG.error("An error occured while running the thread.", e);
