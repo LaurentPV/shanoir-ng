@@ -26,8 +26,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
 
-import javax.swing.JProgressBar;
-
 import org.apache.commons.lang3.StringUtils;
 import org.dcm4che3.data.Attributes;
 import org.dcm4che3.data.ElementDictionary;

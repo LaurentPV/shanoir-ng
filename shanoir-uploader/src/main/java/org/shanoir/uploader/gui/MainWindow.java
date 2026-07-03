@@ -58,6 +58,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.CaretListener;
@@ -71,6 +72,7 @@ import org.shanoir.uploader.ShUpOnloadConfig;
 import org.shanoir.uploader.action.DownloadOrCopyActionListener;
 import org.shanoir.uploader.action.FindDicomActionListener;
 import org.shanoir.uploader.action.ImportDialogOpener;
+import org.shanoir.uploader.action.ImportProgressListener;
 import org.shanoir.uploader.action.RSDocumentListener;
 import org.shanoir.uploader.action.SelectionActionListener;
 import org.shanoir.uploader.dicom.IDicomServerClient;
@@ -90,7 +92,7 @@ import com.formdev.flatlaf.FlatLightLaf;
  *
  */
 @SuppressWarnings("serial")
-public class MainWindow extends JFrame {
+public class MainWindow extends JFrame implements ImportProgressListener{
 
     private static final Logger LOG = LoggerFactory.getLogger(MainWindow.class);
 
@@ -227,7 +229,7 @@ public class MainWindow extends JFrame {
         mnImportExcell.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ImportFromTableWindow importTable = new ImportFromTableWindow(shanoirUploaderFolder, resourceBundle, scrollPaneUpload, dicomServerClient, dicomFileAnalyzer, ShUpOnloadConfig.getShanoirUploaderServiceClient(), ShUpOnloadConfig.getPseudonymizer());
+                ImportFromTableWindow importTable = new ImportFromTableWindow(shanoirUploaderFolder, resourceBundle, scrollPaneUpload, dicomServerClient, dicomFileAnalyzer, ShUpOnloadConfig.getShanoirUploaderServiceClient(), ShUpOnloadConfig.getPseudonymizer(), MainWindow.this);
             }
         });
 
@@ -1024,6 +1026,24 @@ public class MainWindow extends JFrame {
         currentUploadsPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         contentPane.add(tabbedPane, BorderLayout.CENTER);
+    }
+
+    @Override
+    public void onProgress(int percentage, String currentStep) {
+        SwingUtilities.invokeLater(() -> {
+            downloadProgressBar.setValue(percentage);
+            downloadProgressBar.setString(currentStep);
+        });
+    }
+
+    @Override
+    public void onComplete(String reportSummary, boolean success) {
+        SwingUtilities.invokeLater(() -> {
+            if (!success) {
+                //errorDownloadsLB.setText(/* message approprié */);
+            }
+            // logique équivalente à l'ancien JOptionPane
+        });
     }
 
     public FindDicomActionListener getFindDicomActionListener() {

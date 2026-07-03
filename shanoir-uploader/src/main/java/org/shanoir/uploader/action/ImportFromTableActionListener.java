@@ -38,18 +38,21 @@ public class ImportFromTableActionListener implements ActionListener {
     private ResourceBundle resourceBundle;
     private Pseudonymizer pseudonymizer;
 
-    public ImportFromTableActionListener(ImportFromTableWindow importFromTableWindow, ResourceBundle resourceBundle, IDicomServerClient dicomServerClient, ImagesCreatorAndDicomFileAnalyzerService dicomFileAnalyzer, ShanoirUploaderServiceClient shanoirUploaderServiceClientNG, Pseudonymizer pseudonymizer) {
+    private ImportProgressListener progressListener;
+
+    public ImportFromTableActionListener(ImportFromTableWindow importFromTableWindow, ResourceBundle resourceBundle, IDicomServerClient dicomServerClient, ImagesCreatorAndDicomFileAnalyzerService dicomFileAnalyzer, ShanoirUploaderServiceClient shanoirUploaderServiceClientNG, Pseudonymizer pseudonymizer, ImportProgressListener progressListener) {
         this.importFromTableWindow = importFromTableWindow;
         this.dicomServerClient = dicomServerClient;
         this.dicomFileAnalyzer = dicomFileAnalyzer;
         this.shanoirUploaderServiceClientNG = shanoirUploaderServiceClientNG;
         this.resourceBundle = resourceBundle;
         this.pseudonymizer = pseudonymizer;
+        this.progressListener = progressListener;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        ImportFromTableRunner importer = new ImportFromTableRunner(importJobs, resourceBundle, importFromTableWindow, dicomServerClient, dicomFileAnalyzer, shanoirUploaderServiceClientNG, pseudonymizer);
+        ImportFromTableRunner importer = new ImportFromTableRunner(importJobs, resourceBundle, importFromTableWindow, dicomServerClient, dicomFileAnalyzer, shanoirUploaderServiceClientNG, pseudonymizer, progressListener);
         importer.execute();
     }
 

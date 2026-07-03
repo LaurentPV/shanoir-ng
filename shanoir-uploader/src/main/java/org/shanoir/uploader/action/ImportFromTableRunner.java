@@ -70,7 +70,9 @@ public class ImportFromTableRunner extends SwingWorker<Void, Integer> {
     private Pseudonymizer pseudonymizer;
     private IdentifierCalculator identifierCalculator;
 
-    public ImportFromTableRunner(Map<String, ImportJob> importJobs, ResourceBundle ressourceBundle, ImportFromTableWindow importFromTableWindow, IDicomServerClient dicomServerClient, ImagesCreatorAndDicomFileAnalyzerService dicomFileAnalyzer, ShanoirUploaderServiceClient shanoirUploaderServiceClientNG, Pseudonymizer pseudonymizer) {
+    private final ImportProgressListener progressListener;
+
+    public ImportFromTableRunner(Map<String, ImportJob> importJobs, ResourceBundle ressourceBundle, ImportFromTableWindow importFromTableWindow, IDicomServerClient dicomServerClient, ImagesCreatorAndDicomFileAnalyzerService dicomFileAnalyzer, ShanoirUploaderServiceClient shanoirUploaderServiceClientNG, Pseudonymizer pseudonymizer, ImportProgressListener progressListener) {
         this.importJobs = importJobs;
         this.resourceBundle = ressourceBundle;
         this.importFromTableWindow = importFromTableWindow;
@@ -79,6 +81,7 @@ public class ImportFromTableRunner extends SwingWorker<Void, Integer> {
         this.shanoirUploaderServiceClientNG = shanoirUploaderServiceClientNG;
         this.pseudonymizer = pseudonymizer;
         this.identifierCalculator = new IdentifierCalculator();
+        this.progressListener = progressListener;
     }
 
     @Override
@@ -206,7 +209,7 @@ public class ImportFromTableRunner extends SwingWorker<Void, Integer> {
         String studyDescription = importJob.getStudy().getStudyDescription();
         HashMap<String, ImportJob> downloadImportJobs = new HashMap<String, ImportJob>();
         downloadImportJobs.put(importJob.getStudy().getStudyInstanceUID(), importJob);
-        Runnable downloadOrCopyRunnable = new DownloadOrCopyRunnable(true, true, importFromTableWindow.frame, importFromTableWindow.downloadProgressBar,  dicomServerClient, dicomFileAnalyzer,  null, downloadImportJobs);
+        Runnable downloadOrCopyRunnable = new DownloadOrCopyRunnable(true, dicomServerClient, dicomFileAnalyzer,  null, downloadImportJobs, progressListener);
         Thread downloadThread = new Thread(downloadOrCopyRunnable);
         downloadThread.start();
         // Wait for thread to finish

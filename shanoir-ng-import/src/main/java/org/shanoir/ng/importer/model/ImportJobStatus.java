@@ -20,4 +20,4 @@ public record ImportJobStatus(
         String reportSummary,
         boolean done,
         boolean success
-) {}
+) { }

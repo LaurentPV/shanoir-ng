@@ -42,6 +42,7 @@ import javax.swing.table.DefaultTableModel;
 import org.shanoir.ng.importer.dicom.ImagesCreatorAndDicomFileAnalyzerService;
 import org.shanoir.ng.importer.model.ImportJob;
 import org.shanoir.uploader.action.ImportFromTableActionListener;
+import org.shanoir.uploader.action.ImportProgressListener;
 import org.shanoir.uploader.action.UpdateTableImportStudyListener;
 import org.shanoir.uploader.action.UploadFromTableActionListener;
 import org.shanoir.uploader.dicom.IDicomServerClient;
@@ -80,8 +81,9 @@ public class ImportFromTableWindow extends JFrame {
     ShanoirUploaderServiceClient shanoirUploaderServiceClient;
     public JScrollPane scrollPaneUpload;
     UpdateTableImportStudyListener updateTableImportStudyListener;
+    ImportProgressListener progressListener;
 
-    public ImportFromTableWindow(File shanoirUploaderFolder, ResourceBundle resourceBundle, JScrollPane scrollPaneUpload, IDicomServerClient dicomServerClient, ImagesCreatorAndDicomFileAnalyzerService dicomFileAnalyzer, ShanoirUploaderServiceClient shanoirUploaderServiceClientNG, Pseudonymizer pseudonymizer) {
+    public ImportFromTableWindow(File shanoirUploaderFolder, ResourceBundle resourceBundle, JScrollPane scrollPaneUpload, IDicomServerClient dicomServerClient, ImagesCreatorAndDicomFileAnalyzerService dicomFileAnalyzer, ShanoirUploaderServiceClient shanoirUploaderServiceClientNG, Pseudonymizer pseudonymizer, ImportProgressListener progressListener) {
         this.updateTableImportStudyListener = new UpdateTableImportStudyListener(shanoirUploaderServiceClientNG, this);
         this.shanoirUploaderFolder = shanoirUploaderFolder;
         this.resourceBundle = resourceBundle;
@@ -89,6 +91,7 @@ public class ImportFromTableWindow extends JFrame {
         this.dicomFileAnalyzer = dicomFileAnalyzer;
         this.shanoirUploaderServiceClient = shanoirUploaderServiceClientNG;
         this.scrollPaneUpload = scrollPaneUpload;
+        this.progressListener = progressListener;
 
         // Create the frame.
         frame = new JFrame(resourceBundle.getString("shanoir.uploader.import.table.title"));
@@ -256,7 +259,7 @@ public class ImportFromTableWindow extends JFrame {
         progressBar.setVisible(false);
         masterPanel.add(downloadProgressBar, gBCDownloadProgressBar);
 
-        importListener = new ImportFromTableActionListener(this, resourceBundle, dicomServerClient, dicomFileAnalyzer, shanoirUploaderServiceClientNG, pseudonymizer);
+        importListener = new ImportFromTableActionListener(this, resourceBundle, dicomServerClient, dicomFileAnalyzer, shanoirUploaderServiceClientNG, pseudonymizer, progressListener);
         uploadButton.addActionListener(importListener);
 
         // center the frame
