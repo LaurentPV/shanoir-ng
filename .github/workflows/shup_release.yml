@@ -101,6 +101,8 @@ jobs:
             --vendor "Inria" \
             --copyright "© 2025 Inria" \
             --name ShanoirUploader \
+            --linux-package-name shanoiruploader \
+            --linux-app-release 1 \
             --app-version ${{ needs.setup-version.outputs.version_part }} \
             --main-jar shanoir-uploader-${{ needs.setup-version.outputs.version_part }}-jar-with-dependencies.jar \
             --main-class org.shanoir.uploader.ShanoirUploader \
@@ -183,6 +185,13 @@ jobs:
             --win-dir-chooser `
             --win-per-user-install
 
+      - name: Rename installer with architecture suffix
+        run: |
+          $version = "${{ needs.setup-version.outputs.version_part }}"
+          Rename-Item `
+            -Path "shanoir-uploader/target/packages/ShanoirUploader-$version.exe" `
+            -NewName "ShanoirUploader-$version-x64.exe"
+
       - uses: actions/upload-artifact@v4
         with:
           name: shup-exe
@@ -246,10 +255,18 @@ jobs:
             --java-options "-Xmx2g -Dapp.version=v${{ needs.setup-version.outputs.version_part }}" \
             --icon src/main/resources/images/icon.icns \
 
+      - name: Rename installer with architecture suffix
+        run: |
+          version="${{ needs.setup-version.outputs.version_part }}"
+          # macos-latest is an Apple Silicon (arm64) runner, would need 
+          # a second build job for x86_64
+          mv "shanoir-uploader/target/packages/ShanoirUploader-$version.dmg" \
+             "shanoir-uploader/target/packages/ShanoirUploader-$version-arm64.dmg"
+
       - uses: actions/upload-artifact@v4
         with:
           name: shup-dmg
-          path: shanoir-uploader/target/packages/*.dmg
+          path: shanoir-uploader/target/packages/*-arm64.dmg
 
   release:
     needs: [build-linux, build-windows, build-macos, setup-version]
