@@ -137,6 +137,8 @@ public class QueryPACSService {
     }
 
     private Association connectAssociation(DicomNode calling, DicomNode called, boolean cfind) throws Exception {
+        LOG.info("Connecting association: calling AET {} -> called AET {} at {}:{}",
+                calling.getAet(), called.getAet(), called.getHostname(), called.getPort());
         ExecutorService executor = Executors.newSingleThreadExecutor();
         ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
         try {
@@ -707,6 +709,12 @@ public class QueryPACSService {
             @Override
             public void onDimseRSP(Association as, Attributes cmd, Attributes data) {
                 super.onDimseRSP(as, cmd, data);
+                LOG.info("C-MOVE-RSP status: 0x{}, remaining: {}, completed: {}, failed: {}, warning: {}",
+                        Integer.toHexString(cmd.getInt(Tag.Status, -1)),
+                        cmd.getInt(Tag.NumberOfRemainingSuboperations, -1),
+                        cmd.getInt(Tag.NumberOfCompletedSuboperations, -1),
+                        cmd.getInt(Tag.NumberOfFailedSuboperations, -1),
+                        cmd.getInt(Tag.NumberOfWarningSuboperations, -1));
                 DicomProgress p = state.getProgress();
                 if (p != null) {
                     p.setAttributes(cmd);
