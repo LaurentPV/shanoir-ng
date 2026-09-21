@@ -48,7 +48,7 @@ along with this program. If not, see https://www.gnu.org/licenses/gpl-3.0.html
         <appender-ref ref="file" />
     </logger>
 
-    <logger name="org.shanoir.ng.importer.dicom.query.QueryPACSService" level="ERROR" additivity="false">
+    <logger name="org.shanoir.ng.importer.dicom.query.QueryPACSService" level="INFO" additivity="false">
         <appender-ref ref="stdout" />
         <appender-ref ref="file" />
     </logger>
