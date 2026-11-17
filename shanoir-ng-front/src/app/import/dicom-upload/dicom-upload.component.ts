@@ -105,6 +105,7 @@ export class DicomUploadComponent implements OnDestroy {
     private uploadToServer(file: any) {
         this.dicomDirMissingError = false;
         this.fileTooBigError = false;
+        this.otherErrorMessage = null;
         this.extensionError = file[0].name.substring(file[0].name.lastIndexOf("."), file[0].name.length) != '.zip';
 
         this.modality = null;
@@ -129,8 +130,12 @@ export class DicomUploadComponent implements OnDestroy {
                     error: error => {
                         this.setArchiveStatus('error');
                         this.uploadState.progress = 0;
-                        if (error && error.error && error.error.message) {
-                            this.dicomDirMissingError = error.error.message.indexOf("DICOMDIR is missing") != -1
+                        if (error?.error?.message) {
+                            if (error.error.message.indexOf("DICOMDIR is missing") != -1) {
+                                this.dicomDirMissingError = true;
+                            } else {
+                                this.otherErrorMessage = error.error.message;
+                            }
                         }
                         this.fileTooBigError = error.status === 413;
                     }

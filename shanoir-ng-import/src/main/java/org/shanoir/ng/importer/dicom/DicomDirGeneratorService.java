@@ -55,8 +55,11 @@ public class DicomDirGeneratorService {
 
     public void generateDicomDirFromDirectory(File dicomDir, File directory) throws IOException {
         createDicomDir(dicomDir);
-        addReferenceTo(directory, dicomDir);
-        close();
+        try {
+            addReferenceTo(directory, dicomDir);
+        } finally {
+            close();
+        }
     }
 
     private void createDicomDir(File file) throws IOException {
@@ -108,6 +111,17 @@ public class DicomDirGeneratorService {
         }
         char prompt = '.';
         if (fmi == null) {
+            if (dataset.getString(Tag.SOPInstanceUID, null) == null) {
+                if (looksLikeDicomInstance(dataset)) {
+                    // a DICOM image without its mandatory UID: refuse the import rather than
+                    // silently produce an incomplete serie
+                    throw new InvalidDicomFileException("DICOM file without SOP Instance UID (0008,0018): "
+                            + f.getName());
+                }
+                // not DICOM data (text, xml, pdf, thumbnails...): ignore it
+                LOG.warn("skip non-DICOM file '{}'", f);
+                return 0;
+            }
             fmi = dataset.createFileMetaInformation(UID.ImplicitVRLittleEndian);
             prompt = 'F';
         }
@@ -190,6 +204,17 @@ public class DicomDirGeneratorService {
             }
         }
         return num;
+    }
+
+    /**
+     * A file read without file meta information can be any file, as dcm4che parses
+     * arbitrary bytes as implicit VR. It is considered as a DICOM instance only if
+     * it carries attributes that a DICOM instance has.
+     */
+    private boolean looksLikeDicomInstance(Attributes dataset) {
+        return dataset.contains(Tag.SOPClassUID)
+                || dataset.contains(Tag.SeriesInstanceUID)
+                || dataset.contains(Tag.PixelData);
     }
 
     protected void close() {

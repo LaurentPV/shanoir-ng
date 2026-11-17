@@ -40,6 +40,7 @@ import org.shanoir.ng.anonymization.uid.generation.UIDGeneration;
 import org.shanoir.ng.importer.dicom.DicomDirGeneratorService;
 import org.shanoir.ng.importer.dicom.DicomDirToModelService;
 import org.shanoir.ng.importer.dicom.ImagesCreatorAndDicomFileAnalyzerService;
+import org.shanoir.ng.importer.dicom.InvalidDicomFileException;
 import org.shanoir.ng.importer.dicom.query.DicomQuery;
 import org.shanoir.ng.importer.dicom.query.QueryPACSService;
 import org.shanoir.ng.importer.dto.ExaminationDTO;
@@ -244,8 +245,9 @@ public class ImporterApiController implements ImporterApi {
                 FileUtils.deleteQuietly(importJobDir);
             }
             LOG.error("DICOM zip upload failed (userId={})", KeycloakUtil.getTokenUserId(), e);
+            String message = e instanceof InvalidDicomFileException ? e.getMessage() : ERROR_WHILE_SAVING_UPLOADED_FILE;
             throw new RestServiceException(
-                    new ErrorModel(HttpStatus.UNPROCESSABLE_ENTITY.value(), ERROR_WHILE_SAVING_UPLOADED_FILE, null));
+                    new ErrorModel(HttpStatus.UNPROCESSABLE_ENTITY.value(), message, null));
         }
     }
 
