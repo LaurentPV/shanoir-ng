@@ -22,7 +22,6 @@ import org.dcm4che3.data.Tag;
 import org.dcm4che3.data.UID;
 import org.dcm4che3.data.VR;
 import org.dcm4che3.io.DicomInputStream;
-import org.dcm4che3.media.DicomDirReader;
 import org.dcm4che3.media.DicomDirWriter;
 import org.dcm4che3.media.RecordFactory;
 import org.dcm4che3.media.RecordType;
@@ -35,6 +34,11 @@ import org.springframework.stereotype.Service;
 /**
  * This bean generates a DICOMDIR file.
  *
+ * This bean is a singleton shared by all import requests: it must stay
+ * stateless. Everything belonging to one generation (DICOMDIR writer,
+ * record factory) is created per call and passed as parameter, so that
+ * concurrent imports never write into each other's DICOMDIR.
+ *
  * @author mkain
  *
  */
@@ -43,30 +47,25 @@ public class DicomDirGeneratorService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DicomDirGeneratorService.class);
 
-    private FilesetInfo fsInfo = new FilesetInfo();
-
-    private boolean checkDuplicate = false;
-
-    private RecordFactory recFact = new RecordFactory();
-
-    private DicomDirReader in;
-
-    private DicomDirWriter out;
+    private static final boolean CHECK_DUPLICATE = false;
 
     public void generateDicomDirFromDirectory(File dicomDir, File directory) throws IOException {
-        createDicomDir(dicomDir);
-        addReferenceTo(directory, dicomDir);
-        close();
+        DicomDirWriter out = createDicomDir(dicomDir);
+        try {
+            addReferenceTo(out, new RecordFactory(), directory, dicomDir);
+        } finally {
+            close(out);
+        }
     }
 
-    private void createDicomDir(File file) throws IOException {
+    private DicomDirWriter createDicomDir(File file) throws IOException {
+        FilesetInfo fsInfo = new FilesetInfo();
         DicomDirWriter.createEmptyDirectory(file, UIDUtils.createUIDIfNull(fsInfo.getFilesetUID()),
                 fsInfo.getFilesetID(), fsInfo.getDescriptorFile(), fsInfo.getDescriptorFileCharset());
-        out = DicomDirWriter.open(file);
-        in = out;
+        return DicomDirWriter.open(file);
     }
 
-    private int addReferenceTo(File f, File dicomDir) throws IOException {
+    private int addReferenceTo(DicomDirWriter out, RecordFactory recFact, File f, File dicomDir) throws IOException {
         int n = 0;
         if (f.isDirectory()) {
             // skip macOS Finder's zip artifacts: the __MACOSX sibling tree holds
@@ -75,7 +74,7 @@ public class DicomDirGeneratorService {
                 return 0;
             }
             for (String s : f.list()) {
-                n += addReferenceTo(new File(f, s), dicomDir);
+                n += addReferenceTo(out, recFact, new File(f, s), dicomDir);
             }
             return n;
         }
@@ -116,11 +115,11 @@ public class DicomDirGeneratorService {
             LOG.error("skip DICOM file '" + f + "' without SOP Instance UID (0008, 0018)");
             return 0;
         }
-        return addRecords(dataset, n, out.toFileIDs(f), prompt, iuid, fmi);
+        return addRecords(out, recFact, dataset, n, out.toFileIDs(f), prompt, iuid, fmi);
     }
 
-    private int addRecords(Attributes dataset, int num, String[] fileIDs, char prompt, String iuid, Attributes fmi)
-            throws IOException {
+    private int addRecords(DicomDirWriter out, RecordFactory recFact, Attributes dataset, int num, String[] fileIDs,
+            char prompt, String iuid, Attributes fmi) throws IOException {
         String pid = dataset.getString(Tag.PatientID, null);
         String pBirthDate = dataset.getString(Tag.PatientBirthDate);
         String pSex = dataset.getString(Tag.PatientSex);
@@ -134,7 +133,7 @@ public class DicomDirGeneratorService {
                 dataset.setString(Tag.PatientID, VR.LO, pid);
                 prompt = prompt == 'F' ? 'P' : 'p';
             }
-            Attributes patRec = in.findPatientRecord(pid);
+            Attributes patRec = out.findPatientRecord(pid);
             if (patRec == null) {
                 patRec = recFact.createRecord(RecordType.PATIENT, null, dataset, null, null);
                 patRec.setSpecificCharacterSet("ISO_IR 192"); // set to UTF-8
@@ -143,7 +142,7 @@ public class DicomDirGeneratorService {
                 out.addRootDirectoryRecord(patRec);
                 num++;
             }
-            Attributes studyRec = in.findStudyRecord(patRec, studyInstanceUID);
+            Attributes studyRec = out.findStudyRecord(patRec, studyInstanceUID);
             if (studyRec == null) {
                 studyRec = recFact.createRecord(RecordType.STUDY, null, dataset, null, null);
                 studyRec.setSpecificCharacterSet("ISO_IR 192"); // set to UTF-8
@@ -152,7 +151,7 @@ public class DicomDirGeneratorService {
             }
 
             if (seriesInstanceUID != null) {
-                Attributes seriesRec = in.findSeriesRecord(studyRec, seriesInstanceUID);
+                Attributes seriesRec = out.findSeriesRecord(studyRec, seriesInstanceUID);
                 if (seriesRec == null) {
                     seriesRec = recFact.createRecord(RecordType.SERIES, null, dataset, null, null);
                     seriesRec.setSpecificCharacterSet("ISO_IR 192"); // set to UTF-8
@@ -163,8 +162,8 @@ public class DicomDirGeneratorService {
 
                 if (iuid != null) {
                     Attributes instRec;
-                    if (checkDuplicate) {
-                        instRec = in.findLowerInstanceRecord(seriesRec, false, iuid);
+                    if (CHECK_DUPLICATE) {
+                        instRec = out.findLowerInstanceRecord(seriesRec, false, iuid);
                         if (instRec != null) {
                             System.out.print('-');
                             return 0;
@@ -177,8 +176,8 @@ public class DicomDirGeneratorService {
             }
         } else {
             if (iuid != null) {
-                if (checkDuplicate) {
-                    if (in.findRootInstanceRecord(false, iuid) != null) {
+                if (CHECK_DUPLICATE) {
+                    if (out.findRootInstanceRecord(false, iuid) != null) {
                         System.out.print('-');
                         return 0;
                     }
@@ -192,15 +191,13 @@ public class DicomDirGeneratorService {
         return num;
     }
 
-    protected void close() {
-        if (in != null) {
-            try {
-                in.close();
-            } catch (IOException ignore) {
-            }
+    private void close(DicomDirWriter out) {
+        try {
+            // DicomDirWriter.close() commits pending records to the DICOMDIR file
+            out.close();
+        } catch (IOException e) {
+            LOG.error("Error while closing DICOMDIR: {}", e.getMessage(), e);
         }
-        in = null;
-        out = null;
     }
 
 }
